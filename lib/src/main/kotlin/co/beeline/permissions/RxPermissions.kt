@@ -20,14 +20,10 @@ import java.util.*
 class RxPermissions(private val context: Context) {
 
     companion object {
-        val REQUEST_CODE = 8712
+        const val REQUEST_CODE = 8712
     }
 
-    private val subjects: MutableMap<String, BehaviorSubject<Boolean>>
-
-    init {
-        subjects = HashMap<String, BehaviorSubject<Boolean>>(6)
-    }
+    private val subjects: MutableMap<String, BehaviorSubject<Boolean>> = HashMap(6)
 
     /**
      * @return an observable that emits the state changes for a given permission
@@ -40,7 +36,7 @@ class RxPermissions(private val context: Context) {
      * @return an observable that completes when a given permission is granted
      */
     @MainThread fun granted(permission: String): Observable<Boolean> {
-        return observe(permission).filter({ it }) .first()
+        return observe(permission).filter { it == true }.take(1)
     }
 
     @MainThread fun request(activity: Activity, permission: String): Observable<Boolean> {
@@ -59,7 +55,7 @@ class RxPermissions(private val context: Context) {
         return if (hasPermission(permission)) {
             Observable.just(true)
         } else {
-            observe(permission).skip(1).first().doOnSubscribe {
+            observe(permission).skip(1).take(1).doOnSubscribe {
                 request()
             }
         }
@@ -67,7 +63,7 @@ class RxPermissions(private val context: Context) {
 
     @MainThread fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray): Boolean {
         if (requestCode == REQUEST_CODE) {
-            for (i in 0..permissions.size - 1) {
+            for (i in 0 until permissions.size) {
                 subjectForPermission(permissions[i])
                         .onNext(grantResults[i] == PackageManager.PERMISSION_GRANTED)
             }
