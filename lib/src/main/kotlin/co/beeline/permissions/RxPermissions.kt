@@ -5,9 +5,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.support.annotation.MainThread
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
+import androidx.annotation.MainThread
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import rx.Observable
 import rx.subjects.BehaviorSubject
 import java.util.*
@@ -28,7 +28,8 @@ class RxPermissions(private val context: Context) {
     /**
      * @return an observable that emits the state changes for a given permission
      */
-    @MainThread fun observe(permission: String): Observable<Boolean> {
+    @MainThread
+    fun observe(permission: String): Observable<Boolean> {
         return subjectForPermission(permission).asObservable()
     }
 
